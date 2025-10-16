@@ -61,6 +61,8 @@ public class important {
         timer.setRepeats(false);
         timer.start();
     }
+
+    // the efficient methoed 
     
     static void transitionToLoginContent(JFrame frame) {
         frame.getContentPane().removeAll();
@@ -648,3 +650,4 @@ public class important {
         button.setFocusPainted(false);
     }
 }
+
