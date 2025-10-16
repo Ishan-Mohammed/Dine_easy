@@ -165,6 +165,8 @@ public class important {
             }
         });
     }
+
+    // account creation happens here
     
     static void transitionToSignupContent(JFrame frame) {
         frame.getContentPane().removeAll();
@@ -654,6 +656,7 @@ public class important {
         button.setFocusPainted(false);
     }
 }
+
 
 
 
