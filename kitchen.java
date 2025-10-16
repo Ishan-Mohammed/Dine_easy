@@ -76,7 +76,10 @@ public class kitchen {
         ordersPanel = new JPanel();
         ordersPanel.setLayout(new BoxLayout(ordersPanel, BoxLayout.Y_AXIS));
         ordersPanel.setOpaque(false); // Transparent background
-        ordersPanel.setBorder(BorderFactory.createEmptyBorder(0, 300, 0, 300)); // Padding to shrink the area
+        ordersPanel.setBorder(BorderFactory.createEmptyBorder(0, 300, 0, 300)); 
+        
+        // kitchen flow starts from here 
+        // Padding to shrink the area
 
         JScrollPane scrollPane = new JScrollPane(ordersPanel);
         scrollPane.setOpaque(false);
@@ -189,5 +192,6 @@ public class kitchen {
     }
 
 }
+
 
 
