@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.util.Map; // <-- Import added for the new method
 
 public class DatabaseManager {
-// dtatabase should be given here
+
     // --- Database Credentials ---
     // Make sure your database is named "my_app_db"
     private static final String DB_URL = "jdbc:mysql://localhost:3306/my_app_db";
@@ -107,5 +107,4 @@ public class DatabaseManager {
             throw e;
         }
     }
-
 }
