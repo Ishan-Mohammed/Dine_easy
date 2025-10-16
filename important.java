@@ -619,7 +619,7 @@ public class important {
         imgLabel.setHorizontalAlignment(SwingConstants.CENTER);
         imgLabel.setVerticalAlignment(SwingConstants.CENTER);
         return imgLabel;
-    }
+        }
     
     static JButton createPrimaryButton(String text) {
         JButton btn = new JButton(text);
@@ -658,6 +658,7 @@ public class important {
 }
 
 //main execution happens here
+
 
 
 
