@@ -1,14 +1,13 @@
+// NOTE: This class now calls methods from the kitchen.java class.
+
 package dine_easyyy_project;
+
 import javax.swing.*;
 import javax.swing.Timer;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.HashMap;
 import java.util.Map;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class important {
@@ -22,7 +21,6 @@ public class important {
         menu.put("Coffee", 80);
         menu.put("Ice Cream", 100);
         
-        // Use SwingUtilities to ensure thread safety
         SwingUtilities.invokeLater(() -> showSplash());
     }
     
@@ -56,17 +54,15 @@ public class important {
         splashFrame.add(gifLabel);
         splashFrame.setVisible(true);
         
-        // Smooth transition after GIF completes
         int gifDuration = 5000; // 5 seconds
         Timer timer = new Timer(gifDuration, e -> {
-            // Directly transition to login in the same frame
             transitionToLoginContent(splashFrame);
         });
         timer.setRepeats(false);
         timer.start();
     }
     
- static void transitionToLoginContent(JFrame frame) {
+    static void transitionToLoginContent(JFrame frame) {
         frame.getContentPane().removeAll();
         frame.setTitle("Dine Easy - Login");
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -107,7 +103,7 @@ public class important {
         formPanel.add(signInLabel, gbcForm);
         
         JTextField usernameField = new JTextField(20);
-        usernameField.setBorder(BorderFactory.createTitledBorder("Restaurant Name"));
+        usernameField.setBorder(BorderFactory.createTitledBorder("Username"));
         gbcForm.gridy = 1;
         formPanel.add(usernameField, gbcForm);
         
@@ -138,7 +134,26 @@ public class important {
         frame.revalidate();
         frame.repaint();
         
-        loginBtn.addActionListener(e -> transitionToHomeContent(frame));
+        loginBtn.addActionListener(e -> {
+            String username = usernameField.getText().trim();
+            String password = new String(passwordField.getPassword());
+            
+            if (username.isEmpty() || password.isEmpty()) {
+                JOptionPane.showMessageDialog(frame, 
+                        "Please enter both username and password!", 
+                        "Login Error", 
+                        JOptionPane.ERROR_MESSAGE);
+            } else {
+                if (DatabaseManager.validateUser(username, password)) {
+                    transitionToHomeContent(frame);
+                } else {
+                    JOptionPane.showMessageDialog(frame, 
+                            "Invalid username or password!", 
+                            "Login Failed", 
+                            JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
         
         createAccount.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent evt) {
@@ -183,7 +198,7 @@ public class important {
         formPanel.add(signupLabel, gbcForm);
         
         JTextField nameField = new JTextField(20);
-        nameField.setBorder(BorderFactory.createTitledBorder("Full Name"));
+        nameField.setBorder(BorderFactory.createTitledBorder("Username"));
         gbcForm.gridy = 1;
         formPanel.add(nameField, gbcForm);
         
@@ -216,8 +231,40 @@ public class important {
         frame.repaint();
         
         signupBtn.addActionListener(e -> {
-            JOptionPane.showMessageDialog(frame, "Account created successfully!");
-            transitionToLoginContent(frame);
+            String username = nameField.getText().trim();
+            String email = emailField.getText().trim();
+            String password = new String(passField.getPassword());
+            
+            if (username.isEmpty() || email.isEmpty() || password.isEmpty()) {
+                JOptionPane.showMessageDialog(frame, 
+                        "Please fill in all fields!", 
+                        "Signup Error", 
+                        JOptionPane.ERROR_MESSAGE);
+                return; 
+            }
+            
+            try {
+                DatabaseManager.registerUser(username, email, password);
+                
+                JOptionPane.showMessageDialog(frame, 
+                        "Account created successfully!\nYou can now login.", 
+                        "Success", 
+                        JOptionPane.INFORMATION_MESSAGE);
+                transitionToLoginContent(frame); 
+                
+            } catch (SQLException ex) {
+                if (ex.getErrorCode() == 1062) { 
+                    JOptionPane.showMessageDialog(frame, 
+                            "Username or email already exists! Please choose another.", 
+                            "Signup Failed", 
+                            JOptionPane.ERROR_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(frame, 
+                            "A database error occurred: " + ex.getMessage(), 
+                            "Database Error", 
+                            JOptionPane.ERROR_MESSAGE);
+                }
+            }
         });
         
         already.addMouseListener(new MouseAdapter() {
@@ -226,7 +273,7 @@ public class important {
             }
         });
     }
-
+    
     static void transitionToHomeContent(JFrame frame) {
         frame.getContentPane().removeAll();
         frame.setTitle("Dine Easy - Home");
@@ -311,8 +358,8 @@ public class important {
         
         JButton backBtn = new JButton("Back");
         backBtn.setFont(new Font("Arial", Font.PLAIN, 16));
+        
         backBtn.addActionListener(e -> {
-            frame.getContentPane().removeAll();
             transitionToHomeContent(frame);
         });
         topPanel.add(backBtn);
@@ -421,12 +468,16 @@ public class important {
         JScrollPane scrollPane = new JScrollPane(billArea);
         scrollPane.setPreferredSize(new Dimension(400, 500));
         
+        // This displays the bill and waits for the user to click OK
         JOptionPane.showMessageDialog(parentFrame, scrollPane,
                 "Bill for Table " + tableNo,
                 JOptionPane.PLAIN_MESSAGE);
+                
+        // ===== NEW: SEND ORDER TO KITCHEN AFTER BILL IS VIEWED =====
+        kitchen.receiveOrder(tableNo, orders);
     }
-
- // ================= MENU =================
+    
+    // ================= MENU =================
     static void showMenu(int tableNo, JFrame parentFrame) {
         JFrame menuFrame = new JFrame("Table " + tableNo + " - Menu");
         menuFrame.setSize(500, 600);
@@ -496,8 +547,17 @@ public class important {
                 
                 tableOrders.put(tableNo, tableOrder);
                 
-                // ===== Send order to Kitchen =====
-                kitchen.receiveOrder(tableNo, tableOrder, totalAmount, menu);
+                try {
+                    DatabaseManager.saveOrder(tableNo, tableOrder, menu);
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(menuFrame,
+                            "Error: Could not save order to database.\n" + ex.getMessage(),
+                            "Database Error",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+                
+                // ===== MOVED: Order is now sent after viewing the bill =====
+                // kitchen.receiveOrder(tableNo, tableOrder);
                 
                 JOptionPane.showMessageDialog(menuFrame, order.toString(), 
                         "Order Confirmed", JOptionPane.INFORMATION_MESSAGE);
@@ -588,12 +648,3 @@ public class important {
         button.setFocusPainted(false);
     }
 }
-
-
-
-
-
-
-
-
-
