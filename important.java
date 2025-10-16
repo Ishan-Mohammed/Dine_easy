@@ -1,4 +1,4 @@
-// NOTE: This class now calls methods from the kitchen.java class.
+
 
 package dine_easyyy_project;
 
@@ -656,6 +656,9 @@ public class important {
         button.setFocusPainted(false);
     }
 }
+
+//main execution happens here
+
 
 
 
