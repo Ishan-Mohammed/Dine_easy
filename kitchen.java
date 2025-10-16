@@ -184,7 +184,10 @@ public class kitchen {
         card.add(buttonPanel, BorderLayout.SOUTH);
 
         return card;
+
+        // this will return the required output from dining area
     }
 
 }
+
 
