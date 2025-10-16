@@ -354,6 +354,8 @@ public class important {
         JFrame frame = new JFrame("Dine Easy - Dining Area");
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        // flow happening
         
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         topPanel.setBackground(new Color(245, 245, 245));
@@ -650,4 +652,5 @@ public class important {
         button.setFocusPainted(false);
     }
 }
+
 
