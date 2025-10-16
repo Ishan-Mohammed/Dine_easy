@@ -426,4 +426,169 @@ public class important {
                 JOptionPane.PLAIN_MESSAGE);
     }
 
+ // ================= MENU =================
+    static void showMenu(int tableNo, JFrame parentFrame) {
+        JFrame menuFrame = new JFrame("Table " + tableNo + " - Menu");
+        menuFrame.setSize(500, 600);
+        menuFrame.setLocationRelativeTo(parentFrame);
+        menuFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        menuFrame.setLayout(new BorderLayout());
+        
+        JLabel heading = new JLabel("Select Food - Table " + tableNo, SwingConstants.CENTER);
+        heading.setFont(new Font("Segoe UI", Font.BOLD, 22));
+        heading.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        menuFrame.add(heading, BorderLayout.NORTH);
+        
+        JPanel menuPanel = new JPanel(new GridLayout(0, 1, 10, 10));
+        menuPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        
+        Map<String, JSpinner> quantitySpinners = new HashMap<>();
+        
+        for (String item : menu.keySet()) {
+            int price = menu.get(item);
+            JPanel itemPanel = new JPanel(new BorderLayout(10, 0));
+            itemPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            
+            JLabel itemLabel = new JLabel(item + " - ₹" + price);
+            itemLabel.setFont(new Font("Segoe UI", Font.PLAIN, 18));
+            
+            JSpinner qtySpinner = new JSpinner(new SpinnerNumberModel(0, 0, 20, 1));
+            qtySpinner.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+            quantitySpinners.put(item, qtySpinner);
+            
+            itemPanel.add(itemLabel, BorderLayout.WEST);
+            itemPanel.add(qtySpinner, BorderLayout.EAST);
+            menuPanel.add(itemPanel);
+        }
+        
+        JScrollPane scrollPane = new JScrollPane(menuPanel);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        menuFrame.add(scrollPane, BorderLayout.CENTER);
+        
+        JButton confirmBtn = createPrimaryButton("Confirm Order");
+        confirmBtn.setPreferredSize(new Dimension(200, 50));
+        JPanel buttonPanel = new JPanel(new FlowLayout());
+        buttonPanel.add(confirmBtn);
+        
+        confirmBtn.addActionListener(e -> {
+            StringBuilder order = new StringBuilder("Order for Table " + tableNo + ":\n\n");
+            boolean selected = false;
+            int totalAmount = 0;
+            
+            Map<String, Integer> tableOrder = new HashMap<>();
+            
+            for (String item : quantitySpinners.keySet()) {
+                int qty = (Integer) quantitySpinners.get(item).getValue();
+                if (qty > 0) {
+                    int itemTotal = menu.get(item) * qty;
+                    totalAmount += itemTotal;
+                    order.append("- ").append(item)
+                            .append(" x ").append(qty)
+                            .append(" (₹").append(itemTotal).append(")\n");
+                    selected = true;
+                    
+                    tableOrder.put(item, qty);
+                }
+            }
+            
+            if (selected) {
+                order.append("\nTotal: ₹").append(totalAmount);
+                
+                tableOrders.put(tableNo, tableOrder);
+                
+                // ===== Send order to Kitchen =====
+                kitchen.receiveOrder(tableNo, tableOrder, totalAmount, menu);
+                
+                JOptionPane.showMessageDialog(menuFrame, order.toString(), 
+                        "Order Confirmed", JOptionPane.INFORMATION_MESSAGE);
+                menuFrame.dispose();
+            } else {
+                JOptionPane.showMessageDialog(menuFrame, 
+                        "Please select at least one item!", 
+                        "No Items Selected", JOptionPane.WARNING_MESSAGE);
+            }
+        });
+        
+        menuFrame.add(buttonPanel, BorderLayout.SOUTH);
+        menuFrame.setVisible(true);
+    }
+    
+    // ================= COMMON HELPERS =================
+    static JPanel createBackgroundPanel() {
+        JPanel mainPanel = new JPanel(new GridBagLayout());
+        mainPanel.setBackground(new Color(230, 230, 250));
+        return mainPanel;
+    }
+    
+    static JPanel createBoxPanel(int w, int h) {
+        JPanel box = new JPanel(new GridBagLayout());
+        box.setBackground(Color.WHITE);
+        box.setPreferredSize(new Dimension(w, h));
+        box.setBorder(BorderFactory.createLineBorder(new Color(128, 0, 255), 3, true));
+        return box;
+    }
+    
+    static JLabel createImagePlaceholder(int boxWidth, int boxHeight) {
+        java.net.URL imgURL = important.class.getResource("/logo.png");
+        JLabel imgLabel;
+        
+        if (imgURL != null) {
+            ImageIcon icon = new ImageIcon(imgURL);
+            Image scaledImage = icon.getImage().getScaledInstance(
+                    boxWidth / 2 - 40,
+                    boxHeight - 100,
+                    Image.SCALE_SMOOTH
+            );
+            imgLabel = new JLabel(new ImageIcon(scaledImage));
+        } else {
+            imgLabel = new JLabel("Image not found: logo.png", SwingConstants.CENTER);
+            imgLabel.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+            imgLabel.setForeground(Color.RED);
+        }
+        
+        imgLabel.setPreferredSize(new Dimension(boxWidth / 2 - 40, boxHeight - 100));
+        imgLabel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+        imgLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        imgLabel.setVerticalAlignment(SwingConstants.CENTER);
+        return imgLabel;
+    }
+    
+    static JButton createPrimaryButton(String text) {
+        JButton btn = new JButton(text);
+        btn.setBackground(new Color(128, 0, 255));
+        btn.setForeground(Color.WHITE);
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        btn.setFocusPainted(false);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        return btn;
+    }
+    
+    static JLabel createLinkLabel(String text) {
+        JLabel lbl = new JLabel("<HTML><FONT color='#8000ff'><U>" + text + "</U></FONT></HTML>");
+        lbl.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        return lbl;
+    }
+    
+    static JButton createStyledButton(String text, Color bgColor) {
+        JButton button = new JButton(text);
+        button.setFont(new Font("Segoe UI", Font.BOLD, 22));
+        button.setForeground(Color.WHITE);
+        button.setBackground(bgColor);
+        button.setPreferredSize(new Dimension(250, 80));
+        button.setFocusPainted(false);
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        return button;
+    }
+    
+    static void styleTableButton(JButton button) {
+        button.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        button.setBackground(new Color(255, 228, 181));
+        button.setBorder(BorderFactory.createLineBorder(new Color(210, 180, 140), 2, true));
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        button.setFocusPainted(false);
+    }
+}
+
+
+
 
