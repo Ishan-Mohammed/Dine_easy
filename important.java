@@ -66,3 +66,163 @@ public class important {
         timer.start();
     }
     
+ static void transitionToLoginContent(JFrame frame) {
+        frame.getContentPane().removeAll();
+        frame.setTitle("Dine Easy - Login");
+        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.dispose();
+        frame.setUndecorated(false);
+        frame.setVisible(true);
+        
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int boxWidth = (int) (screenSize.width * 0.75);
+        int boxHeight = (int) (screenSize.height * 0.75);
+        
+        JPanel mainPanel = createBackgroundPanel();
+        JPanel boxPanel = createBoxPanel(boxWidth, boxHeight);
+        
+        GridBagConstraints gbcBox = new GridBagConstraints();
+        gbcBox.insets = new Insets(15, 15, 15, 15);
+        gbcBox.fill = GridBagConstraints.BOTH;
+        gbcBox.weightx = 1.0;
+        gbcBox.weighty = 1.0;
+        
+        JLabel imageLabel = createImagePlaceholder(boxWidth, boxHeight);
+        gbcBox.gridx = 0;
+        gbcBox.gridy = 0;
+        gbcBox.gridheight = 6;
+        boxPanel.add(imageLabel, gbcBox);
+        
+        JPanel formPanel = new JPanel(new GridBagLayout());
+        formPanel.setBackground(Color.WHITE);
+        GridBagConstraints gbcForm = new GridBagConstraints();
+        gbcForm.insets = new Insets(10, 10, 10, 10);
+        gbcForm.fill = GridBagConstraints.HORIZONTAL;
+        gbcForm.gridx = 0;
+        
+        JLabel signInLabel = new JLabel("Sign In");
+        signInLabel.setFont(new Font("Segoe UI", Font.BOLD, 28));
+        gbcForm.gridy = 0;
+        formPanel.add(signInLabel, gbcForm);
+        
+        JTextField usernameField = new JTextField(20);
+        usernameField.setBorder(BorderFactory.createTitledBorder("Restaurant Name"));
+        gbcForm.gridy = 1;
+        formPanel.add(usernameField, gbcForm);
+        
+        JPasswordField passwordField = new JPasswordField(20);
+        passwordField.setBorder(BorderFactory.createTitledBorder("Password"));
+        gbcForm.gridy = 2;
+        formPanel.add(passwordField, gbcForm);
+        
+        JCheckBox rememberBox = new JCheckBox("Remember me");
+        gbcForm.gridy = 3;
+        formPanel.add(rememberBox, gbcForm);
+        
+        JButton loginBtn = createPrimaryButton("Sign In");
+        gbcForm.gridy = 4;
+        formPanel.add(loginBtn, gbcForm);
+        
+        JLabel createAccount = createLinkLabel("New here? Create an Account");
+        gbcForm.gridy = 5;
+        formPanel.add(createAccount, gbcForm);
+        
+        gbcBox.gridx = 1;
+        gbcBox.gridy = 0;
+        gbcBox.gridheight = 6;
+        boxPanel.add(formPanel, gbcBox);
+        
+        mainPanel.add(boxPanel);
+        frame.getContentPane().add(mainPanel);
+        frame.revalidate();
+        frame.repaint();
+        
+        loginBtn.addActionListener(e -> transitionToHomeContent(frame));
+        
+        createAccount.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent evt) {
+                transitionToSignupContent(frame);
+            }
+        });
+    }
+    
+    static void transitionToSignupContent(JFrame frame) {
+        frame.getContentPane().removeAll();
+        frame.setTitle("Dine Easy - Sign Up");
+        
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int boxWidth = (int) (screenSize.width * 0.75);
+        int boxHeight = (int) (screenSize.height * 0.75);
+        
+        JPanel mainPanel = createBackgroundPanel();
+        JPanel boxPanel = createBoxPanel(boxWidth, boxHeight);
+        
+        GridBagConstraints gbcBox = new GridBagConstraints();
+        gbcBox.insets = new Insets(15, 15, 15, 15);
+        gbcBox.fill = GridBagConstraints.BOTH;
+        gbcBox.weightx = 1.0;
+        gbcBox.weighty = 1.0;
+        
+        JLabel imageLabel = createImagePlaceholder(boxWidth, boxHeight);
+        gbcBox.gridx = 0;
+        gbcBox.gridy = 0;
+        gbcBox.gridheight = 7;
+        boxPanel.add(imageLabel, gbcBox);
+        
+        JPanel formPanel = new JPanel(new GridBagLayout());
+        formPanel.setBackground(Color.WHITE);
+        GridBagConstraints gbcForm = new GridBagConstraints();
+        gbcForm.insets = new Insets(10, 10, 10, 10);
+        gbcForm.fill = GridBagConstraints.HORIZONTAL;
+        gbcForm.gridx = 0;
+        
+        JLabel signupLabel = new JLabel("Create Account");
+        signupLabel.setFont(new Font("Segoe UI", Font.BOLD, 28));
+        gbcForm.gridy = 0;
+        formPanel.add(signupLabel, gbcForm);
+        
+        JTextField nameField = new JTextField(20);
+        nameField.setBorder(BorderFactory.createTitledBorder("Full Name"));
+        gbcForm.gridy = 1;
+        formPanel.add(nameField, gbcForm);
+        
+        JTextField emailField = new JTextField(20);
+        emailField.setBorder(BorderFactory.createTitledBorder("Email"));
+        gbcForm.gridy = 2;
+        formPanel.add(emailField, gbcForm);
+        
+        JPasswordField passField = new JPasswordField(20);
+        passField.setBorder(BorderFactory.createTitledBorder("Password"));
+        gbcForm.gridy = 3;
+        formPanel.add(passField, gbcForm);
+        
+        JButton signupBtn = createPrimaryButton("Sign Up");
+        gbcForm.gridy = 4;
+        formPanel.add(signupBtn, gbcForm);
+        
+        JLabel already = createLinkLabel("Already have an account? Login");
+        gbcForm.gridy = 5;
+        formPanel.add(already, gbcForm);
+        
+        gbcBox.gridx = 1;
+        gbcBox.gridy = 0;
+        gbcBox.gridheight = 7;
+        boxPanel.add(formPanel, gbcBox);
+        
+        mainPanel.add(boxPanel);
+        frame.getContentPane().add(mainPanel);
+        frame.revalidate();
+        frame.repaint();
+        
+        signupBtn.addActionListener(e -> {
+            JOptionPane.showMessageDialog(frame, "Account created successfully!");
+            transitionToLoginContent(frame);
+        });
+        
+        already.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent evt) {
+                transitionToLoginContent(frame);
+            }
+        });
+    }
