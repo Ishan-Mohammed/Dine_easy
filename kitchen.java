@@ -26,6 +26,7 @@ public class kitchen {
             this.tableNumber = tableNumber;
             this.items = items;
         }
+
     }
 
     public static void showKitchenInterface() {
@@ -90,9 +91,6 @@ public class kitchen {
         kitchenFrame.setVisible(true);
     }
 
-    /**
-     * Receives an order and creates a new order object.
-     */
     public static void receiveOrder(int tableNumber, Map<String, Integer> orderItems) {
         Order newOrder = new Order(tableNumber, orderItems);
         pendingOrders.add(newOrder);
@@ -189,3 +187,4 @@ public class kitchen {
     }
 
 }
+
