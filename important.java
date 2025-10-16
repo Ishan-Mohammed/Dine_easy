@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.sql.SQLException;
 
+// these are required for strong flow of program
+
 public class important {
     static Map<String, Integer> menu = new HashMap<>();
     static Map<Integer, Map<String, Integer>> tableOrders = new HashMap<>();
@@ -652,5 +654,6 @@ public class important {
         button.setFocusPainted(false);
     }
 }
+
 
 
